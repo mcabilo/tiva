@@ -53,5 +53,6 @@ dkms.conf
 /.metadata/
 
 # CCS-specific ignores
-/.settings/
-/.launches/
+*/.settings/
+*/.launches/
+/RemoteSystemsTempFiles
