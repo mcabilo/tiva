@@ -40,7 +40,7 @@ void toggle_color(void){
     if (state == 0x08)
         state = 0x02;
     else
-        state *= 2;
+        state << 1;
 }
 
 
