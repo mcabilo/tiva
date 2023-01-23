@@ -51,17 +51,15 @@ void main(void)
     GPIOPadConfigSet( GPIO_PORTF_BASE , GPIO_PIN_4 , GPIO_STRENGTH_8MA , GPIO_PIN_TYPE_STD_WPU );
 
     uint32_t value = 0;
-    uint8_t state = 0x01;
+    uint8_t state = 0x02;
 
     while(1){
         // Take a reading before every LED blink
         value = GPIOPinRead( GPIO_PORTF_BASE , GPIO_PIN_4 );
 
         // Check if push-button is pressed; if it is, then toggle LED
-        if ( (value & GPIO_PIN_4) == 0 ){
-            state *= 2;             // red = 0x02, blue = 0x04, green = 0x08, off = 0x01
-            state %= 0x0F;          // if value is 0x08 * 2 = 0x10, the value will return to 0x01
-        }
+        if ( (value & GPIO_PIN_4) == 0 )
+            state = (state != 0x08) ? state * 2 : 0x02;  // red = 0x02, blue = 0x04, green = 0x08
 
         // Blink the corresponding color (state)
         GPIOPinWrite( GPIO_PORTF_BASE , state , HIGH);
