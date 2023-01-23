@@ -18,6 +18,7 @@
 #include "inc/hw_memmap.h"          // macros for memory map
 #include "driverlib/sysctl.h"       // system control API
 #include "driverlib/gpio.h"         // general-purpose IO API
+#include "driverlib/rom_map.h"      // macros for memory-saving API calls
 
 /**
  * MACROS
@@ -33,39 +34,39 @@ void main(void)
 {
     // A. System level configuration
     // 1. Setup system clock
-    SysCtlClockSet( SYSCTL_OSC_MAIN | SYSCTL_USE_PLL );     // Use 40MHz clock
+    MAP_SysCtlClockSet( SYSCTL_OSC_MAIN | SYSCTL_USE_PLL );     // Use 40MHz clock
 
     // 2. Enable peripheral for on-board LED (PF3, PF2, PF1) and push button SW1 (PF4)
-    SysCtlPeripheralEnable( SYSCTL_PERIPH_GPIOF );
-    while(!SysCtlPeripheralReady( SYSCTL_PERIPH_GPIOF )){}
+    MAP_SysCtlPeripheralEnable( SYSCTL_PERIPH_GPIOF );
+    while(!MAP_SysCtlPeripheralReady( SYSCTL_PERIPH_GPIOF )){}
 
 
     // B. Peripheral level configuration
     // 3. Configure LED pins
-    GPIOPinTypeGPIOOutput( GPIO_PORTF_BASE , GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3 );
+    MAP_GPIOPinTypeGPIOOutput( GPIO_PORTF_BASE , GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3 );
 
     // 4. Configure push-button pin
-    GPIOPinTypeGPIOInput( GPIO_PORTF_BASE , GPIO_PIN_4 );
+    MAP_GPIOPinTypeGPIOInput( GPIO_PORTF_BASE , GPIO_PIN_4 );
 
     // 5. Enable pull-up resistor
-    GPIOPadConfigSet( GPIO_PORTF_BASE , GPIO_PIN_4 , GPIO_STRENGTH_8MA , GPIO_PIN_TYPE_STD_WPU );
+    MAP_GPIOPadConfigSet( GPIO_PORTF_BASE , GPIO_PIN_4 , GPIO_STRENGTH_8MA , GPIO_PIN_TYPE_STD_WPU );
 
     uint32_t value = 0;
     uint8_t state = 0x02;
 
     while(1){
         // Take a reading before every LED blink
-        value = GPIOPinRead( GPIO_PORTF_BASE , GPIO_PIN_4 );
+        value = MAP_GPIOPinRead( GPIO_PORTF_BASE , GPIO_PIN_4 );
 
         // Check if push-button is pressed; if it is, then toggle LED
         if ( (value & GPIO_PIN_4) == 0 )
             state = (state != 0x08) ? state << 1 : 0x02;  // red = 0x02, blue = 0x04, green = 0x08
 
         // Blink the corresponding color (state)
-        GPIOPinWrite( GPIO_PORTF_BASE , state , HIGH);
-        SysCtlDelay(200000);
-        GPIOPinWrite( GPIO_PORTF_BASE , state , LOW);
-        SysCtlDelay(200000);
+        MAP_GPIOPinWrite( GPIO_PORTF_BASE , state , HIGH);
+        MAP_SysCtlDelay(200000);
+        MAP_GPIOPinWrite( GPIO_PORTF_BASE , state , LOW);
+        MAP_SysCtlDelay(200000);
     }
 
 }
