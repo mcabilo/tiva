@@ -59,7 +59,7 @@ void main(void)
 
         // Check if push-button is pressed; if it is, then toggle LED
         if ( (value & GPIO_PIN_4) == 0 )
-            state = (state != 0x08) ? state * 2 : 0x02;  // red = 0x02, blue = 0x04, green = 0x08
+            state = (state != 0x08) ? state << 1 : 0x02;  // red = 0x02, blue = 0x04, green = 0x08
 
         // Blink the corresponding color (state)
         GPIOPinWrite( GPIO_PORTF_BASE , state , HIGH);
