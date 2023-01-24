@@ -5,6 +5,7 @@
  *
  * Description:
  * Demonstrate the use of an edge-count timer in Tiva C Launchpad.
+ * IMPORTANT!! Use a mercury contact sensor or similar two-state sensor.
  *
  */
 
@@ -20,7 +21,8 @@
 #include "driverlib/gpio.h"         // general-purpose IO API
 #include "driverlib/pin_map.h"      // macros for alternate pin functions
 #include "driverlib/timer.h"        // timer API
-#include "driverlib/interrupt.h"    // interrupt API/#include "driverlib/rom_map.h"      // macros for memory-saving API calls
+#include "driverlib/interrupt.h"    // interrupt API
+#include "driverlib/rom_map.h"      // macros for memory-saving API calls
 #include "driverlib/uart.h"         // UART API
 #include "driverlib/rom_map.h"      // memory-saving API calls
 #include "utils/uartstdio.h"        // utility library for serial printing
@@ -33,7 +35,7 @@ uint32_t ui32InterruptCount = 0;
 /**
  * ISR
  */
-void counted_hundred(void){
+void counted_ten(void){
     MAP_TimerIntClear( TIMER0_BASE , TIMER_CAPA_MATCH );
 
     ui32InterruptCount+=10;
@@ -55,7 +57,7 @@ void main(void)
     /**
      * Application:
      * Edge-counting is only available in 16-bit mode timers. In this project,
-     * we count how many times the mercury liquid has oscillated
+     * we count how many times the mercury liquid has hit the base of the sensor.
      *
      * - PB6 - input pin for mercury sensor
      */
@@ -103,7 +105,7 @@ void main(void)
     MAP_TimerMatchSet( TIMER0_BASE , TIMER_A , 10 );
 
     // 6. Register the port-level interrupt handler
-    TimerIntRegister( TIMER0_BASE , TIMER_A , counted_hundred );
+    TimerIntRegister( TIMER0_BASE , TIMER_A , counted_ten );
 
     // 7. Enable capture match interrupt (not the timeout interrupt!)
     MAP_TimerIntEnable( TIMER0_BASE , TIMER_CAPA_MATCH );
