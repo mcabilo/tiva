@@ -79,18 +79,27 @@ void main(void)
     PWMGenEnable( PWM1_BASE , PWM_GEN_2 );
     PWMGenEnable( PWM1_BASE , PWM_GEN_3 );
 
-    int8_t i;
+    int8_t redDC, greenDC, blueDC;
 
     while(1){
-        for(i = 1; i < 100; i++){
-            PWMPulseWidthSet( PWM1_BASE , PWM_OUT_5 , i);
-            PWMPulseWidthSet( PWM1_BASE , PWM_OUT_7 , 100 - i);
+        for(redDC = 1; redDC < 100; redDC++){
+            greenDC = 100 - redDC;
+            PWMPulseWidthSet( PWM1_BASE , PWM_OUT_5 , redDC);
+            PWMPulseWidthSet( PWM1_BASE , PWM_OUT_7 , greenDC);
             SysCtlDelay(80000);
         }
 
-        for(i = 99; i > 0; i--){
-            PWMPulseWidthSet( PWM1_BASE , PWM_OUT_5 , i);
-            PWMPulseWidthSet( PWM1_BASE , PWM_OUT_7 , 100 - i);
+        for(greenDC = 1; greenDC < 100; greenDC++){
+            blueDC = 100 - greenDC;
+            PWMPulseWidthSet( PWM1_BASE , PWM_OUT_6 , blueDC);
+            PWMPulseWidthSet( PWM1_BASE , PWM_OUT_7 , greenDC);
+            SysCtlDelay(80000);
+        }
+
+        for(blueDC = 1; blueDC < 100; blueDC++){
+            redDC = 100 - blueDC;
+            PWMPulseWidthSet( PWM1_BASE , PWM_OUT_5 , redDC);
+            PWMPulseWidthSet( PWM1_BASE , PWM_OUT_6 , blueDC);
             SysCtlDelay(80000);
         }
     }
