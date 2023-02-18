@@ -41,9 +41,9 @@ void main(void)
 
     // 2. Enable peripherals (Using PWM1 since it uses LED pins)
     MAP_SysCtlPeripheralEnable( SYSCTL_PERIPH_PWM1 );
-    while(!SysCtlPeripheralReady( SYSCTL_PERIPH_PWM1 )) {}
+    while(!MAP_SysCtlPeripheralReady( SYSCTL_PERIPH_PWM1 )) {}
     MAP_SysCtlPeripheralEnable( SYSCTL_PERIPH_GPIOF );
-    while(!SysCtlPeripheralReady( SYSCTL_PERIPH_GPIOF )) {}
+    while(!MAP_SysCtlPeripheralReady( SYSCTL_PERIPH_GPIOF )) {}
 
     // 3. Set PWM clock
     MAP_SysCtlPWMClockSet( SYSCTL_PWMDIV_1 );
@@ -56,51 +56,51 @@ void main(void)
     MAP_GPIOPinConfigure( GPIO_PF3_M1PWM7 );
 
     // 4. Configure the PWM generator for PF1
-    PWMGenConfigure( PWM1_BASE , PWM_GEN_2 , PWM_GEN_MODE_DOWN | PWM_GEN_MODE_NO_SYNC ); // count down mode and no synchronization of counter load & comparator update
-    PWMGenConfigure( PWM1_BASE , PWM_GEN_3 , PWM_GEN_MODE_DOWN | PWM_GEN_MODE_NO_SYNC );
+    MAP_PWMGenConfigure( PWM1_BASE , PWM_GEN_2 , PWM_GEN_MODE_DOWN | PWM_GEN_MODE_NO_SYNC ); // count down mode and no synchronization of counter load & comparator update
+    MAP_PWMGenConfigure( PWM1_BASE , PWM_GEN_3 , PWM_GEN_MODE_DOWN | PWM_GEN_MODE_NO_SYNC );
 
     // 5. Set PWM period
     // Formula: value = system_clock / target_frequency
-    PWMGenPeriodSet( PWM1_BASE , PWM_GEN_2 , 800); // 40MHz / 50kHz = 800
-    PWMGenPeriodSet( PWM1_BASE , PWM_GEN_3 , 800);
+    MAP_PWMGenPeriodSet( PWM1_BASE , PWM_GEN_2 , 800); // 40MHz / 50kHz = 800
+    MAP_PWMGenPeriodSet( PWM1_BASE , PWM_GEN_3 , 800);
 
     // 6. Set pulse width of PF1 to 40%, PF2 to 50%, and PF3 to 10%
-    PWMPulseWidthSet( PWM1_BASE , PWM_OUT_5 , 1);
-    PWMPulseWidthSet( PWM1_BASE , PWM_OUT_6 , 1);
-    PWMPulseWidthSet( PWM1_BASE , PWM_OUT_7 , 1);
+    MAP_PWMPulseWidthSet( PWM1_BASE , PWM_OUT_5 , 1);
+    MAP_PWMPulseWidthSet( PWM1_BASE , PWM_OUT_6 , 1);
+    MAP_PWMPulseWidthSet( PWM1_BASE , PWM_OUT_7 , 1);
 
 
     // 7. Enable PWM output channel
-    PWMOutputState( PWM1_BASE , PWM_OUT_5_BIT , true );
-    PWMOutputState( PWM1_BASE , PWM_OUT_6_BIT , true );
-    PWMOutputState( PWM1_BASE , PWM_OUT_7_BIT , true );
+    MAP_PWMOutputState( PWM1_BASE , PWM_OUT_5_BIT , true );
+    MAP_PWMOutputState( PWM1_BASE , PWM_OUT_6_BIT , true );
+    MAP_PWMOutputState( PWM1_BASE , PWM_OUT_7_BIT , true );
 
     // 8. Enable PWM generator
-    PWMGenEnable( PWM1_BASE , PWM_GEN_2 );
-    PWMGenEnable( PWM1_BASE , PWM_GEN_3 );
+    MAP_PWMGenEnable( PWM1_BASE , PWM_GEN_2 );
+    MAP_PWMGenEnable( PWM1_BASE , PWM_GEN_3 );
 
     int8_t redDC, greenDC, blueDC;
 
     while(1){
         for(redDC = 1; redDC < 100; redDC++){
             greenDC = 100 - redDC;
-            PWMPulseWidthSet( PWM1_BASE , PWM_OUT_5 , redDC);
-            PWMPulseWidthSet( PWM1_BASE , PWM_OUT_7 , greenDC);
-            SysCtlDelay(80000);
+            MAP_PWMPulseWidthSet( PWM1_BASE , PWM_OUT_5 , redDC);
+            MAP_PWMPulseWidthSet( PWM1_BASE , PWM_OUT_7 , greenDC);
+            MAP_SysCtlDelay(80000);
         }
 
         for(greenDC = 1; greenDC < 100; greenDC++){
             blueDC = 100 - greenDC;
-            PWMPulseWidthSet( PWM1_BASE , PWM_OUT_6 , blueDC);
-            PWMPulseWidthSet( PWM1_BASE , PWM_OUT_7 , greenDC);
-            SysCtlDelay(80000);
+            MAP_PWMPulseWidthSet( PWM1_BASE , PWM_OUT_6 , blueDC);
+            MAP_PWMPulseWidthSet( PWM1_BASE , PWM_OUT_7 , greenDC);
+            MAP_SysCtlDelay(80000);
         }
 
         for(blueDC = 1; blueDC < 100; blueDC++){
             redDC = 100 - blueDC;
-            PWMPulseWidthSet( PWM1_BASE , PWM_OUT_5 , redDC);
-            PWMPulseWidthSet( PWM1_BASE , PWM_OUT_6 , blueDC);
-            SysCtlDelay(80000);
+            MAP_PWMPulseWidthSet( PWM1_BASE , PWM_OUT_5 , redDC);
+            MAP_PWMPulseWidthSet( PWM1_BASE , PWM_OUT_6 , blueDC);
+            MAP_SysCtlDelay(80000);
         }
     }
 }
