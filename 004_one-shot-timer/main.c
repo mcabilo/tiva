@@ -64,7 +64,7 @@ void main(void)
 
     // Alert that configuration is complete
     MAP_GPIOPinWrite( GPIO_PORTF_BASE , GPIO_PIN_3 , GPIO_PIN_3 );
-    MAP_SysCtlDelay(8000000);
+    MAP_SysCtlDelay(800000);
     MAP_GPIOPinWrite( GPIO_PORTF_BASE , GPIO_PIN_3 , 0x00 );
 
     // Wait for SW1 to be pressed
@@ -74,7 +74,7 @@ void main(void)
     MAP_TimerEnable( TIMER0_BASE , TIMER_BOTH );
 
     MAP_GPIOPinWrite( GPIO_PORTF_BASE , GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3, 0x0E );
-    while( MAP_TimerLoadGet( TIMER0_BASE , TIMER_BOTH ) > 0 ) {}
+    while( MAP_TimerValueGet( TIMER0_BASE , TIMER_A ) > 0 ) {} // TimerValueGet function only takes TimerA or TimerB as second argument; for 32-bit timers, TimerA is used
     MAP_GPIOPinWrite( GPIO_PORTF_BASE , GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3, 0x00 );
 
     while(1) {}
