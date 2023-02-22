@@ -19,6 +19,7 @@
 #include "driverlib/gpio.h"         // general-purpose input output API
 #include "driverlib/rom_map.h"      // a memory-saving programming model for all APIs
 
+
 /*
  * MACROS
  */
@@ -46,18 +47,17 @@ void main(void)
      */
 
     // 1. Configure system clock
-    MAP_SysCtlClockSet( SYSCTL_USE_PLL | SYSCTL_OSC_MAIN ); //main osc = 1MHz |  Div 5 = 20MHz
+    MAP_SysCtlClockSet( SYSCTL_USE_PLL | SYSCTL_OSC_MAIN ); //main osc = 1MHz |  PLL = 40MHz
 
     // 2. Enable a GPIO port (GPIO A-F)
     MAP_SysCtlPeripheralEnable( SYSCTL_PERIPH_GPIOF );
     while(!MAP_SysCtlPeripheralReady( SYSCTL_PERIPH_GPIOF )){} // wait until peripheral is actually enabled
 
     // 3. Configure GPIO pins as output
-    MAP_GPIOPinTypeGPIOOutput( GPIO_PORTF_BASE , GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3 ); // (PF1, PF2, and PF3 control the built-in RGB LED)
-
+    MAP_GPIOPinTypeGPIOOutput( GPIO_PORTF_BASE , GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3 ); // (PF1, PF2, and PF3 control the built-in RGB LED) 0x0E
 
     // Proceed with whatever function you want your configured pins to do...
-    while(1) {
+    while(true) {
         MAP_GPIOPinWrite( GPIO_PORTF_BASE , WHITE , HIGH);
         MAP_SysCtlDelay(200000);
         MAP_GPIOPinWrite( GPIO_PORTF_BASE , WHITE , LOW);

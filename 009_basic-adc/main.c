@@ -29,7 +29,7 @@ void main(void)
 
     /**
      * Application:
-     * We will enable two ADC channels that can sample signals
+     * We will enable an ADC channel that can sample signals
      * through a simple function call (ADC processor trigger)
      *
      */

@@ -88,10 +88,10 @@ void main(void)
     MAP_IntMasterEnable();
 
 
-    while(1){
+    while(true){
         MAP_GPIOPinWrite( GPIO_PORTF_BASE , state , HIGH );
-        MAP_SysCtlDelay(200000);
+        MAP_SysCtlDelay(2000000);
         MAP_GPIOPinWrite( GPIO_PORTF_BASE , GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3 , LOW );
-        MAP_SysCtlDelay(200000);
+        MAP_SysCtlDelay(2000000);
     }
 }
