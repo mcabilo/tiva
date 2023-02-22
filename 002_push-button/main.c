@@ -54,7 +54,7 @@ void main(void)
     uint32_t value = 0;
     uint8_t state = 0x02;
 
-    while(1){
+    while(true){
         // Take a reading before every LED blink
         value = MAP_GPIOPinRead( GPIO_PORTF_BASE , GPIO_PIN_4 );
 
@@ -64,9 +64,9 @@ void main(void)
 
         // Blink the corresponding color (state)
         MAP_GPIOPinWrite( GPIO_PORTF_BASE , state , HIGH);
-        MAP_SysCtlDelay(200000);
+        MAP_SysCtlDelay(2000000);
         MAP_GPIOPinWrite( GPIO_PORTF_BASE , state , LOW);
-        MAP_SysCtlDelay(200000);
+        MAP_SysCtlDelay(2000000);
     }
 
 }
