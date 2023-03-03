@@ -15,10 +15,22 @@
 #include "stdint.h"                 // standard integer library
 #include "stdbool.h"                // standard boolean library
 #include "inc/hw_memmap.h"          // macros for memory map
+#include "inc/tm4c123gh6pm.h"       // board-specific macros
 #include "driverlib/sysctl.h"       // system control API
 #include "driverlib/gpio.h"         // general-purpose IO API
 #include "driverlib/timer.h"        // timer API
+#include "driverlib/interrupt.h"    // interrupt API
 #include "driverlib/rom_map.h"      // macros for memory-saving API calls
+
+bool isReadyToTurnOff = false;
+
+/**
+ * ISR
+ */
+void timerExpired() {
+    MAP_TimerIntClear( TIMER0_BASE , TIMER_BOTH );
+    isReadyToTurnOff = true;
+}
 
 /**
  * MAIN FUNCTION
@@ -26,6 +38,7 @@
 void main(void)
 {
     uint32_t period;
+
 
     /**
      * Application:
@@ -35,7 +48,7 @@ void main(void)
      */
     // A. System level configuration
     // 1. Setup system clock
-    MAP_SysCtlClockSet( SYSCTL_OSC_MAIN | SYSCTL_USE_PLL );     // Use 40MHz clock
+    MAP_SysCtlClockSet( SYSCTL_OSC_MAIN | SYSCTL_XTAL_16MHZ | SYSCTL_USE_PLL | SYSCTL_SYSDIV_5 ); // Use MOSC to drive 400MHz PLL. The use sysdiv5 to apply a /10 divisor and finally generating a 40MHz clock signal.
 
     // Enable peripheral for on-board LED (PF3, PF2, PF1) and push button SW1 (PF4)
     MAP_SysCtlPeripheralEnable( SYSCTL_PERIPH_GPIOF );
@@ -53,14 +66,30 @@ void main(void)
 
     // 4. Configure Timer0
     // Timer counts down once and expires.
-    MAP_TimerConfigure( TIMER0_BASE , TIMER_CFG_ONE_SHOT );
+    MAP_TimerConfigure( TIMER0_BASE , TIMER_CFG_PERIODIC );
 
     // Timer counts up once and expires.
     //MAP_TimerConfigure( TIMER0_BASE , TIMER_CFG_ONE_SHOT_UP );
 
     // 5. Setup timer period
-    period = MAP_SysCtlClockGet() / 1000; // period == system_clock / target_frequency
-    MAP_TimerLoadSet( TIMER0_BASE, TIMER_BOTH , period - 1); // Set to 1kHz
+    period = MAP_SysCtlClockGet() / 2;
+    MAP_TimerLoadSet( TIMER0_BASE, TIMER_BOTH , period - 1); // since 1 clock cycle is 1/40MHz long, this should take 1/2 sec to finish
+
+    // 6. Register the peripheral-level interrupt handler
+    TimerIntRegister( TIMER0_BASE , TIMER_BOTH , timerExpired );
+
+    // 7. Enable timer interrupt
+    MAP_TimerIntEnable( TIMER0_BASE , TIMER_TIMA_TIMEOUT ); // use timerA for 32-bit timer timeout
+
+    // C. System level interrupt
+    // 8. Set timer interrupt priority
+    MAP_IntPrioritySet( INT_TIMER0A , 0 );
+
+    // 9. Enable interrupt from peripheral
+    MAP_IntEnable( INT_TIMER0A );
+
+    // 10. Enable interrupts to the processor
+    MAP_IntMasterEnable();
 
     // Alert that configuration is complete
     MAP_GPIOPinWrite( GPIO_PORTF_BASE , GPIO_PIN_3 , GPIO_PIN_3 );
@@ -74,8 +103,12 @@ void main(void)
     MAP_TimerEnable( TIMER0_BASE , TIMER_BOTH );
 
     MAP_GPIOPinWrite( GPIO_PORTF_BASE , GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3, 0x0E );
-    while( MAP_TimerValueGet( TIMER0_BASE , TIMER_A ) > 0 ) {} // TimerValueGet function only takes TimerA or TimerB as second argument; for 32-bit timers, TimerA is used
-    MAP_GPIOPinWrite( GPIO_PORTF_BASE , GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3, 0x00 );
 
-    while(1) {}
+    while(1) {
+        if (isReadyToTurnOff){
+            MAP_GPIOPinWrite( GPIO_PORTF_BASE , GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3, 0x00 );
+            isReadyToTurnOff = false;
+        }
+
+    }
 }

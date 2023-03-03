@@ -53,7 +53,7 @@ void main(void)
 
     // A. System level configuration
     // 1. Setup system clock
-    MAP_SysCtlClockSet( SYSCTL_OSC_MAIN | SYSCTL_USE_PLL );     // Use 40MHz clock
+    MAP_SysCtlClockSet( SYSCTL_OSC_MAIN | SYSCTL_XTAL_16MHZ | SYSCTL_USE_PLL | SYSCTL_SYSDIV_5 ); // Use MOSC to drive 400MHz PLL. The use sysdiv5 to apply a /10 divisor and finally generating a 40MHz clock signal.
 
     // Enable peripheral for on-board LED (PF3, PF2, PF1) and push button SW1 (PF4)
     MAP_SysCtlPeripheralEnable( SYSCTL_PERIPH_GPIOF );
@@ -75,33 +75,33 @@ void main(void)
     //MAP_TimerConfigure( TIMER0_BASE , TIMER_CFG_PERIODIC_UP );
 
     // 5. Setup timer period
-    period = MAP_SysCtlClockGet() / 2; // period == system_clock / target_frequency
-    MAP_TimerLoadSet( TIMER0_BASE, TIMER_BOTH , period - 1); // Set to 2Hz
+    period = MAP_SysCtlClockGet() / 2;
+    MAP_TimerLoadSet( TIMER0_BASE, TIMER_BOTH , period - 1); // Set to 1/2 seconds
 
-    // 6. Register the port-level interrupt handler
-    TimerIntRegister( TIMER0_BASE , TIMER_A , toggle_color );
+    // 6. Register the peripheral-level interrupt handler
+    TimerIntRegister( TIMER0_BASE , TIMER_BOTH , toggle_color );
 
     // 7. Enable timer interrupt
     MAP_TimerIntEnable( TIMER0_BASE , TIMER_TIMA_TIMEOUT ); // use timerA for 32-bit timer timeout
 
     // C. System level interrupt
-    // 9. Set timer interrupt priority
+    // 8. Set timer interrupt priority
     MAP_IntPrioritySet( INT_TIMER0A , 0 );
 
-    // 10. Enable interrupt from peripheral
+    // 9. Enable interrupt from peripheral
     MAP_IntEnable( INT_TIMER0A );
 
-    // 11. Enable interrupts to the processor
+    // 10. Enable interrupts to the processor
     MAP_IntMasterEnable();
 
-    // 8. Enable timer
+    // 11. Enable timer
     MAP_TimerEnable( TIMER0_BASE , TIMER_BOTH );
 
     while(1) {
-        if ( control != state ) {
-            MAP_GPIOPinWrite( GPIO_PORTF_BASE , GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3 , 0x00 );
-            state = control;
-            MAP_GPIOPinWrite( GPIO_PORTF_BASE , state << 1 , 0x0E );
+        if ( control != state ) { // only update portF if a new set of LEDs are chosen to be toggled
+            MAP_GPIOPinWrite( GPIO_PORTF_BASE , GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_3 , 0x00 );  // turn off all LEDs
+            state = control;                                                                    // set which LEDs are to turn on this time
+            MAP_GPIOPinWrite( GPIO_PORTF_BASE , state << 1 , 0x0E );                            // move by 1 to the left (since PF0 is a switch!) to switch on corresponding LEDs
         }
     }
 }
