@@ -44,7 +44,6 @@ void toggle_color() {
  */
 void main(void)
 {
-    uint32_t period;
     uint32_t state = 0x0;
 
     /**

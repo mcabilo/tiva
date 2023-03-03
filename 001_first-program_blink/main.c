@@ -47,7 +47,7 @@ void main(void)
      */
 
     // 1. Configure system clock
-    MAP_SysCtlClockSet( SYSCTL_USE_PLL | SYSCTL_OSC_MAIN ); //main osc = 1MHz |  PLL = 40MHz
+    MAP_SysCtlClockSet( SYSCTL_OSC_MAIN | SYSCTL_XTAL_16MHZ | SYSCTL_USE_PLL | SYSCTL_SYSDIV_5 ); // Use MOSC to drive 400MHz PLL. The use sysdiv5 to apply a /10 divisor and finally generating a 40MHz clock signal.
 
     // 2. Enable a GPIO port (GPIO A-F)
     MAP_SysCtlPeripheralEnable( SYSCTL_PERIPH_GPIOF );

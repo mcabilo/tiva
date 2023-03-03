@@ -37,7 +37,7 @@ void main(void)
 
     // A. System level configuration
     // 1. Setup system clock
-    MAP_SysCtlClockSet( SYSCTL_OSC_MAIN | SYSCTL_USE_OSC );     // Use 40MHz clock
+    MAP_SysCtlClockSet( SYSCTL_OSC_MAIN | SYSCTL_XTAL_16MHZ | SYSCTL_USE_PLL | SYSCTL_SYSDIV_5 ); // Use MOSC to drive 400MHz PLL. The use sysdiv5 to apply a /10 divisor and finally generating a 40MHz clock signal.
 
     // 2. Enable peripherals (Using PWM1 since it uses LED pins)
     MAP_SysCtlPeripheralEnable( SYSCTL_PERIPH_PWM1 );
